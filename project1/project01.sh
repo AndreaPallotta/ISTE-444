@@ -9,6 +9,7 @@ pids=()
 
 # ------------ Functions ------------
 
+## Install dependencies neeeded to retrieve data ##
 install_deps() {
     if ! command -v ifstat &>/dev/null; then
         echo "ifstat not found. Installing it..."
@@ -23,6 +24,7 @@ install_deps() {
     fi
 }
 
+## Show an help dialog when running the script with the -h or --help flag ##
 show_help_message() {
     echo ""
     echo "Usage: $0 [OPTIONS]"
@@ -38,6 +40,8 @@ show_help_message() {
     echo "  $0 -o /var/logs/project"
 }
 
+## Loop through the input folder for all c files and compile them ##
+## The executable name will be the name of the c file without extension ##
 compile_c_scripts() {
     for file in "$input_folder"/*.c; do
         local output_file_name="${file%.*}"
@@ -46,6 +50,7 @@ compile_c_scripts() {
     done
 }
 
+## Parse through flags ##
 parse_flags() {
     for arg in "$@"; do
         case $arg in
@@ -73,6 +78,7 @@ parse_flags() {
     done
 }
 
+## Loop through the executables and run them in the background ##
 start_processes() {
     if [ ${#executables[@]} -eq 0 ]; then
         echo "Error: No C executables provided."
@@ -85,6 +91,7 @@ start_processes() {
     done
 }
 
+## Append text to file in the output directory ##
 append_to_file() {
     local file_name="$1"
     local content="$2"
@@ -92,16 +99,8 @@ append_to_file() {
     echo "$content" >> "$output_folder/$file_name"
 }
 
-write_ps_info_to_csv() {
-    local pid="$1"
-    local file_name="$2"
-
-    local cpu=$(ps -p "$pid" -o %cpu=)
-    local mem=$(ps -p "$pid" -o %mem=)
-
-    append_to_file "$file_name" "$(date +%s),$cpu,$mem"
-}
-
+## Loop through the pids and get cpu and memory ##
+## Append the result to a csv file ##
 get_process_metrics() {
     for pid in "${pids[@]}"; do
         proc_name=$(ps -p "$pid" -o comm=)
@@ -119,6 +118,7 @@ get_process_metrics() {
     done
 }
 
+## Get system metrics and append the result to a csv file ##
 get_system_metrics() {
     local file_name="system_metrics.csv"
 
@@ -135,6 +135,7 @@ get_system_metrics() {
     done
 }
 
+## Clean up when the script is terminated ##
 cleanup() {
     for pid in "${pids[@]}"; do
         kill "$pid"
