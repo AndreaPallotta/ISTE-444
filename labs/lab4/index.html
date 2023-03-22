@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ap4534 Lab 4</title>
+    <style>
+      body {
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Borat.jpg?20080109185053');
+        color: chartreuse;
+        font-family: Comic Sans MS;
+        font-size: 30px;
+        text-align: center;
+        padding: 50px;
+      }
+
+      h1 {
+        color: yellow;
+        font-size: 50px;
+        margin-bottom: 0;
+      }
+
+      p {
+        font-size: 40px;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 50px auto;
+        text-align: left;
+        width: 40%;
+      }
+
+      th,
+      td {
+        border: 5px dotted green;
+        padding: 10px;
+        font-size: 25px;
+        color: purple;
+        background-color: lightblue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>The Best Movie EVER: Borat ©</h1>
+    <div
+      style="background-color: white; padding: 0.5rem; margin-bottom: 0.3rem"
+    >
+      <p id="subtitle">
+        <span>Masterpiece</span>
+        <span>by</span>:
+        <span>Andrea</span>
+        <span>Pallotta</span>
+        <span>™</span>
+      </p>
+    </div>
+
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Year</th>
+        <th>Director</th>
+        <th>Favorite Actor</th>
+      </tr>
+      <tr>
+        <td>
+          Borat! Cultural Learnings of America for Make Benefit Glorious Nation
+          of Kazakhstan
+        </td>
+        <td />
+        <td />
+        <td />
+      </tr>
+      <tr>
+        <td />
+        <td>2006</td>
+        <td />
+        <td />
+      </tr>
+      <tr>
+        <td />
+        <td />
+        <td>Larry Charles</td>
+        <td />
+      </tr>
+      <tr>
+        <td />
+        <td />
+        <td />
+        <td>Sacha Baron Cohen</td>
+      </tr>
+    </table>
+
+    <script>
+      const setSubtitleColor = () => {
+        const subtitle = document.querySelector('#subtitle');
+
+        for (let child of subtitle.children) {
+          child.style.color = `#${Math.floor(Math.random() * 16777215).toString(
+            16
+          )}`;
+        }
+      };
+
+      window.onload = () => {
+        setSubtitleColor();
+        setInterval(setSubtitleColor, 500);
+      };
+    </script>
+  </body>
+</html>
