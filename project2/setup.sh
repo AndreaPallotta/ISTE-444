@@ -11,7 +11,6 @@ check_deps() {
     else
         echo "$package is already installed. Skipping..."
     fi
-    echo
 }
 
 create_path() {
@@ -57,10 +56,12 @@ client_dist="./client/dist"
 nginx_config="./config/nginx.conf"
 server_bin="./server/target/release/server"
 ansible_playbook="./playbook.yaml"
+services="./rans.service.d"
 
 client_remote="/var/www/project2/public"
 rans_remote="/etc/rans"
 bin_remote="/usr/bin"
+systemd_remote="/etc/systemd/system"
 
 # Start of script
 
@@ -75,6 +76,7 @@ echo
 
 create_path "$rans_remote" true
 create_path "$client_remote" true
+create_path "$rans_serviced" true
 
 echo
 echo "============ Run Ansible Playbooks ============"
@@ -86,18 +88,12 @@ echo
 echo "============ Setup Files ============"
 echo
 
-copy "$nginx_config" "$rans_remote"
-echo
-
 if [[ ! -e "$client_dist" ]];
     echo "Building client app..."
     (cd client && npm run build)
     echo "Client app successfully built!"
     echo
 fi
-
-copy "$client_dist/*" "$client_remote"
-echo
 
 if [[ ! -e "$server_bin" ]];
     echo "Building server binary..."
@@ -106,8 +102,12 @@ if [[ ! -e "$server_bin" ]];
     echo
 fi
 
+copy "$services" "$systemd_remote"
+copy "$nginx_config" "$rans_remote"
+copy "$client_dist/*" "$client_remote"
 copy "$server_bin" "$bin_remote"
-echo
+
+sudo systemctl daemon-reload
 
 echo "Successfully executed script!"
 echo
