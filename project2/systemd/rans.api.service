@@ -3,7 +3,7 @@ Description=Rust API Service for the RANS Stack
 
 [Service]
 Type=forking
-PIDFile=/var/run/rans.pid
+PIDFile=/var/run/rans.api.pid
 
 ExecStart=/usr/bin/server
 ExecStop=/usr/bin/pkill -f rust
