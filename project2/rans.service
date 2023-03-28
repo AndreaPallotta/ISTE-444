@@ -3,6 +3,6 @@ Description=Daemon for the RANS stack
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/bash -c '/usr/bin/nginx -c /etc/rans/nginx.conf; /etc/rans/server_bin; /usr/bin/arangod'
+ExecStart=/usr/bin/bash -c '/usr/bin/nginx -c /etc/rans/nginx.conf; /usr/bin/server; /usr/bin/arangod'
 ExecStop=/usr/bin/pkill -f 'nginx|rust|arangodb'
 Restart=always
