@@ -12,6 +12,6 @@ pub async fn create_routes(database: Database) -> Router {
         .route("/api/get_items", get(items::get_items))
         .route("/api/add_item", post(items::add_item))
         .route("/api/edit_item", put(items::edit_item))
-        .route("/api/delete_items", delete(items::delete_items))
+        .route("/api/delete_item", delete(items::delete_item))
         .layer(Extension(database))
 }
