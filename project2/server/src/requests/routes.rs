@@ -1,8 +1,13 @@
-use axum::{routing::{get, post, put, delete}, Router, Extension};
-
+use axum::{routing::{get, post, put, delete}, Router, Extension, http::HeaderName};
 use crate::db::Database;
-
 use crate::requests::{auth, items};
+use tower_http::{
+    compression::CompressionLayer,
+    propagate_header::PropagateHeaderLayer,
+    trace::TraceLayer,
+    validate_request::ValidateRequestHeaderLayer,
+};
+
 
 pub async fn create_routes(database: Database) -> Router {
     Router::new()
@@ -14,4 +19,8 @@ pub async fn create_routes(database: Database) -> Router {
         .route("/api/edit_item", put(items::edit_item))
         .route("/api/delete_item", delete(items::delete_item))
         .layer(Extension(database))
+        .layer(TraceLayer::new_for_http())
+        .layer(CompressionLayer::new())
+        .layer(PropagateHeaderLayer::new(HeaderName::from_static("x-request-id")))
+        .layer(ValidateRequestHeaderLayer::accept("application/json"))
 }
