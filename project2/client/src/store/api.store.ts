@@ -15,7 +15,7 @@ interface AxiosResponse<T> {
     error?: string;
 }
 
-const prefix = 'api.project2.com';
+const prefix = import.meta.env.DEV ? 'http://localhost:3000' : 'api.project2.com';
 
 export const client = axios.create({
     baseURL: `http://${prefix}`,
@@ -23,8 +23,6 @@ export const client = axios.create({
         'Content-Type': 'application/json',
     },
 });
-
-type RequestType = 'get' | 'post' | 'put' | 'delete';
 
 export async function get<T>(endpoint: string, params: T): Promise<AxiosResponse<T>> {
     try {
