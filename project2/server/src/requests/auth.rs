@@ -28,7 +28,7 @@ pub async fn handle_login(Extension(database): Extension<Database>, Json(payload
     let mut bind_vars: HashMap<&str, Value> = HashMap::new();
     bind_vars.insert("email", email.to_owned().into());
 
-    let users: Vec<User> = database.arango_db.aql_bind_vars("FOR user IN User FILTER user.email == @email RETURN UNSET(user,['_id','_rev'])", bind_vars).await.unwrap();
+    let users: Vec<User> = database.arango_db.aql_bind_vars("FOR user IN User FILTER user.email == @email RETURN user", bind_vars).await.unwrap();
 
     if users.is_empty() {
         (StatusCode::NOT_FOUND, generate_error("User not found"))
@@ -58,7 +58,7 @@ pub async fn handle_signup(Extension(database): Extension<Database>, Json(payloa
         email: @email,
         password: @password
     } INTO User
-    RETURN UNSET(NEW,['_id','_rev'])
+    RETURN NEW
     ";
 
     let mut bind_vars = HashMap::new();
@@ -76,6 +76,6 @@ pub async fn handle_signup(Extension(database): Extension<Database>, Json(payloa
 
     match user {
         Some(u) => (StatusCode::OK, Json(ApiResponse::Success(u))),
-        None => (StatusCode::BAD_REQUEST, generate_error("Error creating user")),
+        None => (StatusCode::INTERNAL_SERVER_ERROR, generate_error("Error creating user")),
     }
 }
