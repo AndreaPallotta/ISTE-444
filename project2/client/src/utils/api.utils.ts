@@ -23,7 +23,6 @@ export const client = axios.create({
 export async function axiosGet<T, B>(endpoint: string, params?: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.get(endpoint, { data: params });
-        console.log(data);
         return { status, data };
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -36,7 +35,6 @@ export async function axiosGet<T, B>(endpoint: string, params?: B): Promise<Axio
 
 export async function axiosPost<T, B>(endpoint: string, body: B): Promise<AxiosResponse<T>> {
     try {
-        console.log(body);
         const { status, data } = await client.post(endpoint, body);
         return { status, data };
     } catch (err) {

@@ -10,16 +10,24 @@
         <Content class="mdc-typography--body2">
           <h2 class="mdc-typography--headline6" style="margin: 0;">
             {item.name}
+            {#if item.quantity === 0}
+              <span style="color: red;">(Out of Stock)</span>
+            {/if}
           </h2>
-          <h4 class="mdc-typography--headline4">{item.description}</h4>
+          <h4 class="mdc-typography--headline4" id="description-label">
+            {item.description}
+            {#if item.description.length === 0}
+              &nbsp;
+            {/if}
+          </h4>
 
           <div class="mdc-typography--headline6"><b>Price: </b> ${item.price}</div>
-          <div class="mdc-typography--headline6"><b>Quantity:</b> {item.quantity}</div>
+          <div class="mdc-typography--headline6"><b>Quantity:</b> {formatNumberLiteral(item.quantity)}</div>
         </Content>
       </PrimaryAction>
       <Actions>
         <ActionButtons>
-          <Button>
+          <Button on:click={handleEdit}>
             <Label>Edit</Label>
           </Button>
           <Button on:click={handleDelete}>
@@ -42,11 +50,16 @@
   } from '@smui/card';
   import { createEventDispatcher } from 'svelte';
   import type { Item } from '../types/models';
+  import { formatNumberLiteral } from '../utils/utils';
 
   const dispatch = createEventDispatcher();
 
   const handleDelete = () => {
     dispatch("delete", item._key);
+  }
+
+  const handleEdit = () => {
+    dispatch("edit", item);
   }
 
   export let item: Item;

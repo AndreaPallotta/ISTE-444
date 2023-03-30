@@ -102,7 +102,6 @@
         const response = await axiosPost<IUser, ISignUp>("/api/auth/signup", signUp);
 
         if (response.error || !response.data) {
-            console.log(response.error);
             $notifStore.open(response.error ?? 'Error Logging in', 'error');
             return;
         }

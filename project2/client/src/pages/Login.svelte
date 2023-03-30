@@ -56,11 +56,11 @@
     import Textfield from '@smui/textfield';
     import Icon from '@smui/textfield/icon';
     import { Link } from 'svelte-navigator';
+    import type { ISignIn } from '../store/auth.store';
     import authStore from '../store/auth.store';
     import notifStore from '../store/notification.store';
-    import { axiosPost } from '../utils/api.utils';
     import type { IUser } from '../types/models';
-    import type { ISignIn } from '../store/auth.store';
+    import { axiosPost } from '../utils/api.utils';
 
     const signIn: ISignIn = {
         email: "",

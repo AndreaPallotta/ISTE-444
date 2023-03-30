@@ -3,7 +3,6 @@
   import { Route, Router } from "svelte-navigator";
   import NavBar from "./components/NavBar.svelte";
   import Notification from "./components/Notification.svelte";
-  import notifStore from "./store/notification.store";
   import routes from "./utils/routing";
 
   let topAppBar: TopAppBar;
@@ -13,7 +12,7 @@
   <NavBar {topAppBar} />
   <AutoAdjust {topAppBar} class="page-wrapper">
     {#each routes as { path, component }}
-        <Route {path} {component}></Route>
+        <Route {path} {component} primary={false} />
     {/each}
   </AutoAdjust>
 </Router>

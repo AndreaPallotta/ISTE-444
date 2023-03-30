@@ -9,12 +9,16 @@
 
   const handleSearch = () => {
     dispatch("search", query);
-  }
+  };
 
   const handleClear = () => {
     query = "";
     dispatch("clear");
-  }
+  };
+
+  const handleAdd = () => {
+    dispatch("add");
+  };
 
   onMount(() => {
     const input = document.getElementById("search-input");
@@ -32,5 +36,6 @@
   {#if query}
     <IconButton class="material-icons" on:click={handleClear}>clear</IconButton>
   {/if}
-  <Button disabled={query.trim().length === 0} on:click={handleSearch} variant="raised" style="padding: 1.5rem;">Search</Button>
+  <Button on:click={query.trim().length === 0 ? handleClear : handleSearch} variant="raised" style="padding: 1.5rem; flex: 0.1">Search</Button>
+  <Button on:click={handleAdd} variant="raised" style="padding: 1.5rem; flex: 0.1">Add Item</Button>
 </div>
