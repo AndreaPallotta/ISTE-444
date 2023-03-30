@@ -50,10 +50,32 @@ copy() {
     echo "$src successfully copied in $dest"
 }
 
+create_symlink() {
+    local src="$1"
+    local dest="$2"
+
+    if [[ ! -e "$src" ]]; then
+        echo "$src not found"
+    fi
+
+    if [[ ! -e "$dest" ]]; then
+        echo "$dest not found"
+    fi
+
+    sudo ln -s "$src" "$dest"
+
+    if [[ $? -ne 0 ]]; then
+        echo "Symlink failed"
+        return 1
+    fi
+
+    echo "Successfully symlinked $src to $dest"
+}
+
 # Variables
 
 client_dist="./client/dist"
-nginx_config="./config/nginx.conf"
+nginx_configs="./config"
 server_bin="./server/target/release/server"
 ansible_playbook="./playbook.yaml"
 services="./rans.service.d"
@@ -62,6 +84,9 @@ client_remote="/var/www/project2/public"
 rans_remote="/etc/rans"
 bin_remote="/usr/bin"
 systemd_remote="/etc/systemd/system"
+nginx_availables="/etc/nginx/sites-available"
+nginx_enabled="/etc/nginx/sites-enabled"
+
 
 # Start of script
 
@@ -103,11 +128,20 @@ if [[ ! -e "$server_bin" ]];
 fi
 
 copy "$services" "$systemd_remote"
-copy "$nginx_config" "$rans_remote"
+copy "$nginx_configs/*.conf" "$rans_remote"
+copy "$nginx_configs/*.com" "$nginx_availables"
 copy "$client_dist/*" "$client_remote"
 copy "$server_bin" "$bin_remote"
 
+echo
+
+create_symlink "$nginx_availables/rans.iste444.com" "$nginx_enabled"
+create_symlink "$nginx_availables/ransapi.iste444.com" "$nginx_enabled"
+
+echo
+
 sudo systemctl daemon-reload
+sudo systemctl restart nginx &>/dev/null
 
 echo "Successfully executed script!"
 echo

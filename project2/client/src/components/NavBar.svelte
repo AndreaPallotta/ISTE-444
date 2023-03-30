@@ -6,9 +6,8 @@
     Title
   } from '@smui/top-app-bar';
   import { Link } from 'svelte-navigator';
-  import type { IRoute } from '../utils/routing';
+  import routes from "../utils/routing";
 
-  export let routes: IRoute[];
   export let topAppBar: TopAppBar;
 </script>
 

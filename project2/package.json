@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@material/typography": "^14.0.0"
+  }
+}

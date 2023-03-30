@@ -1,4 +1,6 @@
-import type { SvelteComponent } from "svelte";
+import Home from "../pages/Home.svelte";
+import Login from "../pages/Login.svelte";
+import Signup from "../pages/Signup.svelte";
 
 export interface IRoute {
     path: string;
@@ -7,3 +9,24 @@ export interface IRoute {
     props?: object | undefined;
     isProtected?: boolean;
 };
+
+const routes: IRoute[] = [
+    {
+        path: '/',
+        name: 'Home',
+        component: Home,
+        isProtected: true,
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: Login,
+    },
+    {
+        path: '/signup',
+        name: 'Sign Up',
+        component: Signup,
+    }
+];
+
+export default routes;

@@ -12,14 +12,16 @@ export interface ISignUp {
     password: string;
 }
 
-export const signIn = writable<ISignIn>({
-    email: '',
-    password: ''
-});
+export interface IUser {
+    _key: string;
+    _rev: string;
+    _id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+}
 
-export const signUp = writable<ISignUp>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: ''
-});
+const authStore = writable<IUser>(null);
+
+export default authStore;

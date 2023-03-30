@@ -15,7 +15,7 @@ interface AxiosResponse<T> {
     error?: string;
 }
 
-const prefix = import.meta.env.DEV ? 'http://localhost:3000' : 'api.project2.com';
+const prefix = import.meta.env.DEV ? 'http://localhost:3000' : 'ransapi.iste444.com';
 
 export const client = axios.create({
     baseURL: `http://${prefix}`,
@@ -24,9 +24,9 @@ export const client = axios.create({
     },
 });
 
-export async function get<T>(endpoint: string, params: T): Promise<AxiosResponse<T>> {
+export async function axiosGet<T, B>(endpoint: string, params: B | undefined): Promise<AxiosResponse<T>> {
     try {
-        const { status, data } = await get(endpoint, params);
+        const { status, data } = await client.get(endpoint, { data: params });
         return { status, data };
     } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -37,7 +37,7 @@ export async function get<T>(endpoint: string, params: T): Promise<AxiosResponse
     }
 };
 
-export async function post<T>(endpoint: string, body: T): Promise<AxiosResponse<T>> {
+export async function axiosPost<T, B>(endpoint: string, body: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.post(endpoint, body);
         return { status, data };
@@ -50,7 +50,7 @@ export async function post<T>(endpoint: string, body: T): Promise<AxiosResponse<
     }
 };
 
-export async function put<T>(endpoint: string, body: T): Promise<AxiosResponse<T>> {
+export async function axiosPut<T, B>(endpoint: string, body: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.put(endpoint, body);
         return { status, data };
@@ -63,7 +63,7 @@ export async function put<T>(endpoint: string, body: T): Promise<AxiosResponse<T
     }
 };
 
-export async function deleteFn<T>(endpoint: string, body: T): Promise<AxiosResponse<T>> {
+export async function axiosDelete<T, B>(endpoint: string, body: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.delete(endpoint, { data: body });
         return { status, data };
