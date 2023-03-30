@@ -35,7 +35,7 @@
             variant="raised"
             type="submit"
             style="width: 100%;"
-            on:click={testNotif}
+            on:click={handleLogin}
             >
             <Label>Log In</Label>
         </Button>
@@ -74,11 +74,13 @@
         const response = await axiosPost<IUser, ISignIn>("/api/auth/login", signIn);
 
         if (response.error || !response.data) {
-            console.log(`Error: ${response.error ?? "Error Logging in"}`);
+            $notifStore.open(response.error ?? 'Error Logging in', 'error');
+        }
+
+        $authStore = response.data.content as IUser;
+
+        if ($authStore != null) {
+            $notifStore.open('Successfully logged in', 'success');
         }
     };
-
-    const testNotif = () => {
-        $notifStore.open("Test", "success");
-    }
 </script>

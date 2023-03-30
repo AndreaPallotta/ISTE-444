@@ -5,7 +5,7 @@ use tower_http::{
     compression::CompressionLayer,
     propagate_header::PropagateHeaderLayer,
     trace::TraceLayer,
-    validate_request::ValidateRequestHeaderLayer,
+    validate_request::ValidateRequestHeaderLayer, cors::CorsLayer,
 };
 
 
@@ -23,4 +23,5 @@ pub async fn create_routes(database: Database) -> Router {
         .layer(CompressionLayer::new())
         .layer(PropagateHeaderLayer::new(HeaderName::from_static("x-request-id")))
         .layer(ValidateRequestHeaderLayer::accept("application/json"))
+        .layer(CorsLayer::permissive())
 }

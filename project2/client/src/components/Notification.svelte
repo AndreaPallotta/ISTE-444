@@ -1,10 +1,9 @@
-<Snackbar bind:this={snackbar} class={$notifStore.variant && `demo=${$notifStore.variant}`}>
+<Snackbar bind:this={snackbar} class={$notifStore.variant && `snackbar-${$notifStore.variant}`}>
   <Label>{$notifStore.message}</Label>
   <Actions>
     <IconButton class="material-icons" title="Dismiss">close</IconButton>
   </Actions>
 </Snackbar>
-
 
 <script lang="ts">
   import IconButton from '@smui/icon-button';
