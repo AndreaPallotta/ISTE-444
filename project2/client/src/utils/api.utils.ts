@@ -31,7 +31,7 @@ export async function axiosGet<T, B>(endpoint: string, params: B | undefined): P
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const { data, status } = err.response ?? {};
-            return { error: data?.content.error_msg || "Unknown Error", status };
+            return { error: data?.content?.error_msg || err.message, status };
         }
         return { error: 'Request failed with unknown error' };
     }
@@ -45,7 +45,7 @@ export async function axiosPost<T, B>(endpoint: string, body: B): Promise<AxiosR
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const { data, status } = err.response ?? {};
-            return { error: data?.content.error_msg || err.message, status };
+            return { error: data?.content?.error_msg || err.message, status };
         }
         return { error: `Request failed with unknown error: ${err.message}` };
     }
@@ -58,7 +58,7 @@ export async function axiosPut<T, B>(endpoint: string, body: B): Promise<AxiosRe
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const { data, status } = err.response ?? {};
-            return { error: data?.content.error_msg || "Unknown Error", status };
+            return { error: data?.content?.error_msg || err.message, status };
         }
         return { error: 'Request failed with unknown error' };
     }
@@ -71,7 +71,7 @@ export async function axiosDelete<T, B>(endpoint: string, body: B): Promise<Axio
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const { data, status } = err.response ?? {};
-            return { error: data?.content.error_msg || "Unknown Error", status };
+            return { error: data?.content?.error_msg || err.message, status };
         }
         return { error: 'Request failed with unknown error' };
     }

@@ -30,7 +30,7 @@
 
         <Button
             disabled={isButtonDisabled}
-            color="secondary"
+            color="primary"
             class="button"
             variant="raised"
             type="submit"
@@ -75,6 +75,7 @@
 
         if (response.error || !response.data) {
             $notifStore.open(response.error ?? 'Error Logging in', 'error');
+            return;
         }
 
         $authStore = response.data.content as IUser;

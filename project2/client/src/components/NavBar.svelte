@@ -11,7 +11,7 @@
   export let topAppBar: TopAppBar;
 </script>
 
-<TopAppBar bind:this={topAppBar} variant="standard" color="secondary">
+<TopAppBar bind:this={topAppBar} variant="standard" color="primary">
   <Row>
     <Section>
         <IconButton class="material-icons">menu</IconButton>
@@ -26,11 +26,3 @@
     </Section>
   </Row>
 </TopAppBar>
-
-<style>
-    :global(.nav-link) {
-        padding-right: 1.5rem;
-        color: white;
-        text-decoration: none;
-    }
-</style>

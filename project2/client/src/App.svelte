@@ -18,23 +18,3 @@
   </AutoAdjust>
 </Router>
 <Notification />
-
-<style>
-  :global(body),
-  :global(html) {
-    display: block;
-    padding: 0;
-  }
-
-  :global(#app) {
-    padding: 0;
-    margin: 0;
-    width: 100vw;
-  }
-
-  :global(.page-wrapper) {
-    display: block;
-    height: 100vh;
-    width: 100vw;
-  }
-</style>
