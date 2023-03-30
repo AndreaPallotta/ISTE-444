@@ -22,7 +22,7 @@
           <Button>
             <Label>Edit</Label>
           </Button>
-          <Button>
+          <Button on:click={handleDelete}>
             <Label>Delete</Label>
           </Button>
         </ActionButtons>
@@ -40,7 +40,14 @@
     Media,
     PrimaryAction
   } from '@smui/card';
+  import { createEventDispatcher } from 'svelte';
   import type { Item } from '../types/models';
+
+  const dispatch = createEventDispatcher();
+
+  const handleDelete = () => {
+    dispatch("delete", item._key);
+  }
 
   export let item: Item;
 </script>

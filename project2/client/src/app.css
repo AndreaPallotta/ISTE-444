@@ -90,7 +90,6 @@ button:focus-visible {
 }
 
 #search-bar {
-  background-color: #fff;
   display: flex;
   display: row;
   justify-content: space-around;
@@ -109,4 +108,5 @@ button:focus-visible {
 
 #home-wrapper {
   width: 100vw;
+  background-color: #fff;
 }

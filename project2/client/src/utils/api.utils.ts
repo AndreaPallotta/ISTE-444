@@ -1,12 +1,8 @@
 import axios from 'axios';
 
-interface ApiResponseError {
-    error_msg: string;
-}
-
 interface ApiResponse<T> {
     result: string;
-    content: ApiResponseError | T;
+    content: T;
 }
 
 interface AxiosResponse<T> {
@@ -27,13 +23,14 @@ export const client = axios.create({
 export async function axiosGet<T, B>(endpoint: string, params?: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.get(endpoint, { data: params });
+        console.log(data);
         return { status, data };
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const { data, status } = err.response ?? {};
             return { error: data?.content?.error_msg || err.message, status };
         }
-        return { error: 'Request failed with unknown error' };
+        return { error: `Request failed with unknown error: ${err.message}` };
     }
 };
 
@@ -60,7 +57,7 @@ export async function axiosPut<T, B>(endpoint: string, body: B): Promise<AxiosRe
             const { data, status } = err.response ?? {};
             return { error: data?.content?.error_msg || err.message, status };
         }
-        return { error: 'Request failed with unknown error' };
+        return { error: `Request failed with unknown error: ${err.message}` };
     }
 };
 
@@ -73,6 +70,6 @@ export async function axiosDelete<T, B>(endpoint: string, body: B): Promise<Axio
             const { data, status } = err.response ?? {};
             return { error: data?.content?.error_msg || err.message, status };
         }
-        return { error: 'Request failed with unknown error' };
+        return { error: `Request failed with unknown error: ${err.message}` };
     }
 };
