@@ -24,7 +24,7 @@ const routes: IRoute[] = [
     },
     {
         path: '/signup',
-        name: 'Sign Up',
+        name: 'Sign up',
         component: Signup,
     }
 ];
