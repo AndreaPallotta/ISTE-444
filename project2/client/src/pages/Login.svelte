@@ -56,18 +56,19 @@
     import Textfield from '@smui/textfield';
     import Icon from '@smui/textfield/icon';
     import { Link } from 'svelte-navigator';
-    import type { ISignIn, IUser } from '../store/auth.store';
     import authStore from '../store/auth.store';
     import notifStore from '../store/notification.store';
     import { axiosPost } from '../utils/api.utils';
+    import type { IUser } from '../types/models';
+    import type { ISignIn } from '../store/auth.store';
 
     const signIn: ISignIn = {
         email: "",
         password: "",
     }
 
-    $: isPasswordValid = signIn.password.trim().length >= 8;
-    $: isEmailValid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(signIn.email);
+    $: isPasswordValid = signIn.password.trim().length > 0;
+    $: isEmailValid = signIn.email.trim().length > 0;
     $: isButtonDisabled = !isPasswordValid || !isEmailValid;
 
     const handleLogin = async () => {
@@ -80,8 +81,6 @@
 
         $authStore = response.data.content as IUser;
 
-        if ($authStore != null) {
-            $notifStore.open('Successfully logged in', 'success');
-        }
+        $notifStore.open('Successfully logged in', 'success');
     };
 </script>

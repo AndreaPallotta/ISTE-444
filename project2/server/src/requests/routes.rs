@@ -13,7 +13,7 @@ pub async fn create_routes(database: Database) -> Router {
     Router::new()
         .route("/api/auth/login", post(auth::handle_login))
         .route("/api/auth/signup", post(auth::handle_signup))
-        .route("/api/get_item/:id", get(items::get_item))
+        .route("/api/get_item/:name", get(items::get_item))
         .route("/api/get_items", get(items::get_items))
         .route("/api/add_item", post(items::add_item))
         .route("/api/edit_item", put(items::edit_item))

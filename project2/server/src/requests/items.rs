@@ -50,16 +50,16 @@ struct ItemUpdate {
     quantity: Option<i64>,
 }
 
-pub async fn get_item(Extension(database): Extension<Database>, Path(id): Path<String>) -> (StatusCode, Json<ApiResponse<Item>>) {
+pub async fn get_item(Extension(database): Extension<Database>, Path(name): Path<String>) -> (StatusCode, Json<ApiResponse<Vec<Item>>>) {
     let mut bind_vars: HashMap<&str, Value> = HashMap::new();
-    bind_vars.insert("key", id.to_owned().into());
+    bind_vars.insert("name", name.to_owned().into());
 
-    match database.arango_db.aql_bind_vars("FOR item IN Item FILTER item._key == @key RETURN item", bind_vars).await {
+    match database.arango_db.aql_bind_vars("FOR item IN Item FILTER LOWER(item.name) LIKE CONCAT('%', LOWER(@name), '%') RETURN item", bind_vars).await {
         Ok(items) => {
-            if let Some(item) = items.into_iter().next() {
-                (StatusCode::OK, Json(ApiResponse::Success(item)))
+            if items.is_empty() {
+                (StatusCode::NOT_FOUND, generate_error("No Item Matches Provided Name"))
             } else {
-                (StatusCode::NOT_FOUND, generate_error("No Item Matches Provided ID"))
+                (StatusCode::OK, Json(ApiResponse::Success(items)))
             }
         }
         Err(e) => {

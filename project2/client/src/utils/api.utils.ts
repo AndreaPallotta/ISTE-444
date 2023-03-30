@@ -24,7 +24,7 @@ export const client = axios.create({
     },
 });
 
-export async function axiosGet<T, B>(endpoint: string, params: B | undefined): Promise<AxiosResponse<T>> {
+export async function axiosGet<T, B>(endpoint: string, params?: B): Promise<AxiosResponse<T>> {
     try {
         const { status, data } = await client.get(endpoint, { data: params });
         return { status, data };

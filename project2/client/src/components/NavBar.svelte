@@ -15,13 +15,13 @@
   <Row>
     <Section>
         <IconButton class="material-icons">menu</IconButton>
-        <Title>Project 2</Title>
+        <Title>E-Commerce With RANS</Title>
     </Section>
     <Section align="end" toolbar>
         {#each routes as { path, name, isProtected }}
-            {#if !isProtected}
+            <!-- {#if !isProtected} -->
                 <Link to={path} class="nav-link">{name}</Link>
-            {/if}
+            <!-- {/if} -->
         {/each}
     </Section>
   </Row>
