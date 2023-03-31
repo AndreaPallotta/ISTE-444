@@ -1,67 +1,75 @@
-use axum::{body::BoxBody, http::{Request, Response}};
-use std::convert::Infallible;
-use tracing::error;
-use std::net::SocketAddr;
-use std::fs::OpenOptions;
+use log::{Log, Record, Level, Metadata, LevelFilter};
+use std::{fs, path::PathBuf};
+use chrono::Utc;
 use std::io::Write;
-use chrono::{DateTime, Utc};
 
-pub async fn log_request<T: Send + 'static>(
-    start_time: DateTime<Utc>,
-    addr: SocketAddr,
-    req: Request<T>
-) -> Result<Request<T>, Infallible> {
-    let mut headers = String::new();
-    for (name, value) in req.headers() {
-        headers.push_str(&format!("{}: {}\n", name.as_str(), value.to_str().unwrap()));
+struct Logger {
+    info_file: fs::File,
+    error_file: fs::File,
+}
+
+impl Logger {
+    fn new(path: &str) -> Logger {
+        let log_dir_path =  PathBuf::from(path);
+        create_folder_path(&log_dir_path);
+
+        let mut info_log = log_dir_path.clone();
+        let mut error_log = log_dir_path.clone();
+
+        let timestamp = Utc::now().format("%Y-%m-%d").to_string();
+
+        info_log.push(format!("info-{}.log", timestamp));
+        error_log.push(format!("error-{}.log", timestamp));
+
+        Self {
+            info_file: create_new_file(&info_log),
+            error_file: create_new_file(&error_log),
+        }
     }
-    let log_message = format!(
-        "{} - {}, \"{} {}\", {}",
-        start_time.format("%Y-%m-%d %H:%M:%S"),
-        req.method(),
-        req.uri(),
-        addr,
-        headers
-    );
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("http-logs.log")
-        .unwrap();
-    writeln!(file, "{}", log_message).unwrap();
-    Ok(req)
 }
 
-pub async fn log_response<T: Send + 'static>(
-    res: Response<BoxBody>,
-    req: Request<T>,
-    start_time: DateTime<Utc>
-) -> Result<Response<BoxBody>, Infallible> {
-    let status = res.status();
-    let duration = Utc::now().signed_duration_since(start_time).num_milliseconds();
-    let log_message = format!(
-        "{} - {}, \"{} {}\", {} ms\n",
-        start_time.format("%Y-%m-%d %H:%M:%S"),
-        req.method(),
-        req.uri(),
-        status.as_u16(),
-        duration,
-    );
-    let mut file = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("http-logs.log")
-        .unwrap();
-    writeln!(file, "{}", log_message).unwrap();
-    Ok(res)
+impl Log for Logger {
+    fn enabled(&self, metadata: &Metadata) -> bool {
+        metadata.level() <= Level::Info
+    }
+
+    fn flush(&self) {}
+
+    fn log(&self, record: &Record) {
+        if self.enabled(record.metadata()) {
+            let timestamp = Utc::now().format("%Y-%m-%dT%H:%M:%S").to_string();
+            let message = format!("{} - {} - {}", timestamp, record.level(), record.args());
+            let mut file = match record.level() {
+                Level::Error => &self.error_file,
+                _ => &self.info_file,
+            };
+
+            if let Err(err) = writeln!(file, "{}", message) {
+                eprintln!("error writing to log file: {}", err);
+            }
+        }
+    }
 }
 
-pub async fn log_error(err: axum::Error, addr: SocketAddr, start_time: DateTime<Utc>) {
-    error!("{} - {} - {}", addr, start_time, err);
-    let mut file = OpenOptions::new()
+pub fn set_log(path: &str, level: LevelFilter) {
+    let logger = Logger::new(path);
+    log::set_boxed_logger(Box::new(logger)).unwrap();
+    log::set_max_level(level);
+}
+
+fn create_new_file(name: &PathBuf) -> fs::File {
+    fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open("error-logs.log")
-        .unwrap();
-    writeln!(file, "{} - {}", start_time, err).unwrap();
+        .open(name)
+        .ok()
+        .unwrap()
+}
+
+fn create_folder_path(path: &PathBuf) {
+    if !path.exists() {
+        if let Err(e) = fs::create_dir_all(path) {
+            eprintln!("failed to create directory {}: {}", path.display(), e);
+        }
+    }
 }

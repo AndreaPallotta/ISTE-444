@@ -1,15 +1,24 @@
 use axum::Router;
+use server::toml_env::{Config, DatabaseConfig};
 use std::net::SocketAddr;
 use server::db::{Database, DBConnector};
 use server::requests::routes::create_routes;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    let parse_config = Config::from("../config/config.toml");
 
-    let db: Database = get_db().await;
+    let config = match parse_config {
+        Ok(config) => config,
+        Err(err) => {
+            eprintln!("Error reading config file: {:?}", err);
+            return;
+        }
+    };
 
-    let app: Router = create_routes(db).await;
+    let db: Database = get_db(config.db).await;
+
+    let app: Router = create_routes(db, config.log.path.as_str()).await;
 
     let addr: SocketAddr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::info!("listening on {}", addr);
@@ -19,15 +28,13 @@ async fn main() {
         .unwrap();
 }
 
-async fn get_db() -> Database {
+async fn get_db(config: DatabaseConfig) -> Database {
     let connector: DBConnector = DBConnector {
-        db_url: "http://localhost:8529".to_string(),
-        db_name: "project2".to_string(),
-        db_username: "root".to_string(),
-        db_password: "root".to_string(),
+        db_url: config.get_url(),
+        db_name: config.name,
+        db_username: config.username,
+        db_password: config.password,
     };
 
-    let db: Database = Database::new(connector).await.expect("Failed to connect to database");
-
-    db
+    Database::new(connector).await.expect("Failed to connect to database")
 }
