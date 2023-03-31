@@ -6,5 +6,5 @@ username = "root"
 password = "root"
 
 [Logs]
-path = "../logs/"
+path = "/var/log/rans"
 level = "info" # off | debug | trace | info | warn | error

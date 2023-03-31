@@ -27,7 +27,6 @@ create_path() {
     else
         mkdir -p "$path"
     fi
-
     echo "$path successfully created!"
 }
 
@@ -41,12 +40,10 @@ copy() {
     fi
 
     sudo cp -r "$src" "$dest"
-
     if [[ $? -ne 0 ]]; then
         echo "Copy failed"
         return 1
     fi
-
     echo "$src successfully copied in $dest"
 }
 
@@ -63,13 +60,23 @@ create_symlink() {
     fi
 
     sudo ln -s "$src" "$dest"
-
     if [[ $? -ne 0 ]]; then
         echo "Symlink failed"
         return 1
     fi
 
     echo "Successfully symlinked $src to $dest"
+}
+
+create_zip_cron() {
+    local cron_job="55 11 * * * if [ $(du -sm /var/log/rans | awk '{print $1}') -gt 50 ]; then cd /var/log/rans && zip -r log_files.zip . && rm -r *; fi"
+
+    if crontab -l | grep -q "$cron_job"; then
+        echo "Cron job already exists. Skipping..."
+    else
+        (crontab -l 2>/dev/null; echo "$cron_job") | crontab -
+        echo "Successfully added cron job"
+    fi
 }
 
 # Variables
@@ -128,7 +135,8 @@ if [[ ! -e "$server_bin" ]];
 fi
 
 copy "$services" "$systemd_remote"
-copy "$nginx_configs/*.conf" "$rans_remote"
+copy "$nginx_configs/nginx.conf" "$rans_remote"
+copy "$nginx_configs/config.toml" "$rans_remote"
 copy "$nginx_configs/*.com" "$nginx_availables"
 copy "$client_dist/*" "$client_remote"
 copy "$server_bin" "$bin_remote"
@@ -143,6 +151,13 @@ echo
 sudo systemctl daemon-reload
 sudo systemctl restart nginx &>/dev/null
 
+echo
+echo "============ Cron Job ============"
+echo
+
+create_zip_cron
+
+echo
 echo "Successfully executed script!"
 echo
 
