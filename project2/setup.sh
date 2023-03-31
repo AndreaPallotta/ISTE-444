@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Functions
-
 check_deps() {
     local package="$1"
     if ! command -v $package &> /dev/null; then
@@ -80,7 +79,6 @@ create_zip_cron() {
 }
 
 # Variables
-
 client_dist="./client/dist"
 nginx_configs="./config"
 server_bin="./server/target/release/server"
