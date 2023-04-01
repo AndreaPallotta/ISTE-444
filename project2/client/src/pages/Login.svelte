@@ -1,5 +1,5 @@
 <div class="container">
-    <div>
+    <div style="background-color: rgb(207, 205, 204, 0.4); padding: 3rem; border-radius: 10px">
         <Textfield
             variant="filled"
             bind:value={signIn.email}
@@ -15,17 +15,26 @@
             variant="filled"
             bind:value={signIn.password}
             label="Password"
-            type="password"
+            {type}
             style="width: 100%; margin-bottom: 1rem;"
             required
             invalid={!isPasswordValid}
         >
             <Icon class="material-icons" slot="leadingIcon">key</Icon>
+            <IconButton
+                bind:innerHTML={icon}
+                on:click={toggleVisibility}
+                class="material-icons"
+                slot="trailingIcon"
+                style="outline: none;"
+            >
+                {icon}
+            </IconButton>
         </Textfield>
 
         <div class="mdc-typography--headline4" style="padding-bottom: 1rem;">
             Don't have an account?
-            <Link to="/signup">Sign up here</Link>
+            <Link to="/signup" style="color: red;">Sign up here</Link>
         </div>
 
         <Button
@@ -53,9 +62,11 @@
 
 <script lang="ts">
     import Button, { Label } from '@smui/button';
+    import IconButton from '@smui/icon-button';
     import Textfield from '@smui/textfield';
     import Icon from '@smui/textfield/icon';
-    import { Link } from 'svelte-navigator';
+    import { onMount } from 'svelte';
+    import { Link, useNavigate } from 'svelte-navigator';
     import type { ISignIn } from '../store/auth.store';
     import authStore from '../store/auth.store';
     import notifStore from '../store/notification.store';
@@ -66,10 +77,18 @@
         email: "",
         password: "",
     }
+    const navigate = useNavigate();
 
+    let isVisible = false;
+    $: icon = isVisible ? "visibility" : "visibility_off";
+    $: type = isVisible ? "text" : "password";
     $: isPasswordValid = signIn.password.trim().length > 0;
     $: isEmailValid = signIn.email.trim().length > 0;
     $: isButtonDisabled = !isPasswordValid || !isEmailValid;
+
+    const toggleVisibility = () => {
+        isVisible = !isVisible;
+    };
 
     const handleLogin = async () => {
         const response = await axiosPost<IUser, ISignIn>("/api/auth/login", signIn);
@@ -80,7 +99,20 @@
         }
 
         $authStore = response.data.content as IUser;
-
         $notifStore.open('Successfully logged in', 'success');
+
+        try {
+            localStorage.setItem("auth", JSON.stringify($authStore));
+        } catch (err) {
+            $notifStore.open(`Error saving auth in local storage: ${err.message}`, 'error');
+        }
+
+        navigate('/');
     };
+
+    onMount(() => {
+        if ($authStore !== null) {
+            navigate('/');
+        }
+    });
 </script>

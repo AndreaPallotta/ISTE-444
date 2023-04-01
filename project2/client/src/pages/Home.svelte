@@ -2,7 +2,7 @@
   import LayoutGrid, { Cell } from '@smui/layout-grid';
   import { onMount } from 'svelte';
   import ItemCard from "../components/ItemCard.svelte";
-  import { default as EditModal, default as ItemModal } from '../components/ItemModal.svelte';
+  import ItemModal from '../components/ItemModal.svelte';
   import SearchBar from '../components/SearchBar.svelte';
   import itemsStore from '../store/items.store';
   import notifStore from '../store/notification.store';
@@ -75,8 +75,6 @@
     await getItems();
     $notifStore.open(`Successfully created "${e.detail.name}"`, 'success');
     closeModal();
-
-    closeModal();
   };
 
   const openModal = (e: CustomEvent<Item>) => {
@@ -105,7 +103,5 @@
     {/each}
     </LayoutGrid>
 
-    {#if open}
-      <ItemModal {itemToEdit} {open} on:close={closeModal} on:update={saveEditedItem} on:add={addNewItem} />
-    {/if}
+    <ItemModal {itemToEdit} {open} on:close={closeModal} on:update={saveEditedItem} on:add={addNewItem} />
 </div>

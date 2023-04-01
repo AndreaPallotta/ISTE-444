@@ -12,9 +12,9 @@ type NumberLiteral = {
 };
 
 const numberLiteralMap: NumberLiteral = {
-    K: 1000,
-    M: 1000000,
     B: 1000000000,
+    M: 1000000,
+    K: 1000,
 };
 
 export const formatNumberLiteral = (value: number) => {

@@ -51,12 +51,9 @@ pub async fn create_routes(database: Database, path: &str) -> Router {
                 })
                 .on_response(|response: &Response, latency: Duration, span: &Span| {
                     let status = response.status().as_u16();
-                    let content_type = response
-                        .headers().get("content-type")
-                        .unwrap().to_str().unwrap_or("Unknown Content-Type");
                     let body = response.body();
                     println!("{} Response generated in {}ms", status, latency.as_millis());
-                    info!("{}, {}, {:?}, {}ms", status, content_type, body, latency.as_millis());
+                    info!("{}, {:?}, {}ms", status, body, latency.as_millis());
                     debug!("{:?}, {:?}, {:?}", response, latency, span);
                 })
                 .on_body_chunk(|chunk: &Bytes, latency: Duration, span: &Span| {

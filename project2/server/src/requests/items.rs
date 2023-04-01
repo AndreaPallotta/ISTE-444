@@ -71,11 +71,7 @@ pub async fn get_item(Extension(database): Extension<Database>, Path(name): Path
 pub async fn get_items(Extension(database): Extension<Database>) -> (StatusCode, Json<ApiResponse<Vec<Item>>>) {
     match database.arango_db.aql_str("FOR item IN Item RETURN item").await {
         Ok(items) => {
-        if items.is_empty() {
-                (StatusCode::NOT_FOUND, generate_error("No Item Matches Provided ID"))
-            } else {
-                (StatusCode::OK, Json(ApiResponse::Success(items)))
-            }
+            (StatusCode::OK, Json(ApiResponse::Success(items)))
         }
         Err(e) => {
             (StatusCode::INTERNAL_SERVER_ERROR, generate_error(format!("Error getting items: {}", e.to_string()).as_str()))

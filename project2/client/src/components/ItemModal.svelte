@@ -1,6 +1,7 @@
 <Dialog
   bind:open
   on:close={handleClose}
+  on:keydown={handleKeyDown}
   aria-labelledby="edit-modal-title"
   aria-describedby="edit-modal-content"
   surface$style="width: 850px; max-width: calc(100vw - 32px);"
@@ -84,6 +85,7 @@
       isFormModified = true;
     }
   }
+  $: isModalOpen = open;
   $: isNameValid = item.name.trim().length > 0;
   $: isPriceValid = item.price > 0 && item.price <= 1000000;
   $: isQuantityValid = item.quantity >= 0 && item.price <= 1000000;
@@ -94,8 +96,15 @@
   const dispatch = createEventDispatcher();
 
   const handleClose = () => {
+    open = false;
     dispatch("close");
   };
+
+  const handleKeyDown = (e: any) => {
+    if (e.key === 'Escape' || e.key ===  'Esc') {
+      handleClose();
+    }
+  }
 
   const handleSave = () => {
     dispatch(itemToEdit === null ? "add" : "update", item);

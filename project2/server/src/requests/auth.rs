@@ -3,6 +3,7 @@ use axum::Extension;
 use axum::{http::StatusCode, Json};
 use serde::Deserialize;
 use serde_json::Value;
+use bcrypt::{hash, DEFAULT_COST, verify};
 use crate::db::Database;
 use crate::models::User;
 use crate::api::{ApiResponse, generate_error};
@@ -35,12 +36,11 @@ pub async fn handle_login(Extension(database): Extension<Database>, Json(payload
     } else {
         let user = &users[0];
 
-        if password == user.password {
+        if verify(password, &user.password).unwrap_or(false) {
             (StatusCode::OK, Json(ApiResponse::Success(user.clone())))
         } else {
-            (StatusCode::BAD_REQUEST, generate_error("Email and/or password do not match"))
+            (StatusCode::BAD_REQUEST, generate_error("Email and/or password are wrong"))
         }
-
     }
 }
 
@@ -50,13 +50,20 @@ pub async fn handle_signup(Extension(database): Extension<Database>, Json(payloa
     let email: String = payload.email;
     let password: String = payload.password;
 
+    let hashed_password = match hash(password, DEFAULT_COST) {
+        Ok(h) => h,
+        Err(err) => return (StatusCode::INTERNAL_SERVER_ERROR, generate_error(format!("Error hashing password: {:?}", {err}).as_str())),
+    };
+
+    println!("{}", hashed_password);
+
     let query =
     "
     INSERT {
         first_name: @first_name,
         last_name: @last_name,
         email: @email,
-        password: @password
+        password: @hashed_password
     } INTO User
     RETURN NEW
     ";
@@ -65,17 +72,21 @@ pub async fn handle_signup(Extension(database): Extension<Database>, Json(payloa
     bind_vars.insert("first_name", first_name.into());
     bind_vars.insert("last_name", last_name.into());
     bind_vars.insert("email", email.into());
-    bind_vars.insert("password", password.into());
+    bind_vars.insert("hashed_password", hashed_password.into());
 
     let result = database.arango_db.aql_bind_vars(query, bind_vars).await;
 
-    let user = match result {
-        Ok(mut users) => users.pop(),
-        Err(_) => None,
-    };
-
-    match user {
-        Some(u) => (StatusCode::OK, Json(ApiResponse::Success(u))),
-        None => (StatusCode::INTERNAL_SERVER_ERROR, generate_error("Error creating user")),
+    match result {
+        Ok(mut users) => {
+            if let Some(user) = users.pop() {
+                (StatusCode::OK, Json(ApiResponse::Success(user)))
+            } else {
+                (StatusCode::INTERNAL_SERVER_ERROR, generate_error("Error creating user"))
+            }
+        },
+        Err(err) => {
+            eprintln!("Error creating user: {:?}", err);
+            (StatusCode::INTERNAL_SERVER_ERROR, generate_error("Email is already associated with another user"))
+        }
     }
 }
